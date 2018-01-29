@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd"
+       default-lazy-init="true">
+
+    <description>Spring Configuration</description>
+
+    <!--开启注解-->
+    <context:annotation-config/>
+
+    <context:component-scan base-package="com.tiangouforum">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--引入属性文件 -->
+    <context:property-placeholder location="classpath:databaseConfig-DEV.properties" />
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!--基本属性-->
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <!--配置数据库连接池初始化大小、最小闲置连接数、最大活跃连接数-->
+        <property name="initialSize" value="3"/>
+        <property name="minIdle" value="1"/>
+        <property name="maxActive" value="20"/>
+
+        <!--配置获取连接超时的等待时间-->
+        <property name="maxWait" value="6000"/>
+
+        <!--配置间隔多久进行一次数据库连接检测，检测需要被关闭的空闲连接，单位为毫秒-->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+        <!--配置一个连接在池中最小生存的时间，单位是毫秒-->
+        <property name="minEvictableIdleTimeMillis" value="30000" />
+
+        <!--检测连接是否有效的SQL语句，mysql用select 'x',oracle用select 1 from dual.当为null时，testWhileIdle/testOnBorrow/testOnReturn均无效-->
+        <property name="validationQuery" value="SELECT 'x'" />
+        <!--申请连接时，空闲连接存活时间大于timeBetweenEvictionRunsMillis时，执行validationQuery检测-->
+        <property name="testWhileIdle" value="true" />
+        <!--申请连接时执行validationQuery-->
+        <property name="testOnBorrow" value="true" />
+        <!--归还连接时执行validationQuery-->
+        <property name="testOnReturn" value="true" />
+
+        <!--打开PScache，mysql5.5以上，可提高性能-->
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+
+        <!--配置监控统计拦截的filters-->
+        <property name="filters" value="stat" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath*:com/**/FrmuserinfMapper.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.tiangouforum.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:advice id="txAdvice" transaction-manager="transactionManager"/>
+
+    <aop:config>
+        <aop:pointcut id="serviceMethods" expression="execution(public * com.tiangouforum.service.*.*(..))" />
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods" />
+    </aop:config>
+
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+
+</beans>
