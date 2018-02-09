@@ -11,10 +11,6 @@
         <!-- 如果是监听多个文件，可用‘，’隔开 -->
         <param-value>classpath:spring-*.xml</param-value>
     </context-param>
-    <context-param>
-        <param-name/>
-        <param-value/>
-    </context-param>
 
     <listener>
         <description>配置Spring上下文监听器</description>
@@ -48,7 +44,14 @@
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
+    <filter>
+        <filter-name>loginFilter</filter-name>
+        <filter-class>com.tiangouforum.filter.loginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>loginFilter</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
     <!-- Spring MVC 核心控制器 DispatcherServlet 配置开始 -->
     <servlet>
         <servlet-name>SpringMVC</servlet-name>
