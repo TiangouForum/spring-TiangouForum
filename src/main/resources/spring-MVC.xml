@@ -26,7 +26,7 @@
     <bean id="defaultViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:order="3" >
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
         <property name="contentType" value="text/html" />
-        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="prefix" value="/jsp/"/>
         <property name="suffix" value=".jsp" /><!--可为空,方便实现自已的依据扩展名来选择视图解释类的逻辑  -->
     </bean>
 
@@ -40,8 +40,6 @@
 
     <!-- Bean解析器,级别高于默认解析器,寻找bean对象进行二次处理 -->
     <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0" />
-
-
 
     <!-- 对静态资源文件的访问， 将无法mapping到Controller的path交给default servlet handler处理 -->
     <mvc:default-servlet-handler />

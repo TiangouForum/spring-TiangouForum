@@ -34,14 +34,14 @@ public class UserService {
      * @return
      */
     public boolean varify(Frmuserinf frmuserinf) {
-//        FrmuserinfExample frmuserinfExample = new FrmuserinfExample();
-//        frmuserinfExample.createCriteria().
-//                andUserregnamEqualTo(frmuserinf.getUserregnam()).
-//                andUserpasswdEqualTo(frmuserinf.getUserpasswd());
-//        Long count = frmuserinfDao.countByExample(frmuserinfExample);
-//        if (count == 1) {
-//            return true;
-//        }
+        FrmuserinfExample frmuserinfExample = new FrmuserinfExample();
+        frmuserinfExample.createCriteria().
+                andUserregnamEqualTo(frmuserinf.getUserregnam()).
+                andUserpasswdEqualTo(frmuserinf.getUserpasswd());
+        Long count = frmuserinfDao.countByExample(frmuserinfExample);
+        if (count == 1) {
+            return true;
+        }
         return false;
     }
 }

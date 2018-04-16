@@ -20,7 +20,7 @@ public class loginFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         String[] notFilter =
-                new String[]{"/html", "/js", "/css", "/user/register", "/user/login"};
+                new String[]{"/html", "/js", "/css", "/user/register", "/user/login", "/webjars"};
         String uri = httpServletRequest.getRequestURI();
 
         boolean doFilter = true;
