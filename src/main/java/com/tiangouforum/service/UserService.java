@@ -2,7 +2,10 @@ package com.tiangouforum.service;
 
 import com.tiangouforum.dao.FrmuserinfDao;
 import com.tiangouforum.domain.Frmuserinf;
+import com.tiangouforum.domain.FrmuserinfExample;
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -13,16 +16,32 @@ import javax.annotation.Resource;
  */
 @Service("UserService")
 public class UserService {
-    @Resource(name="FrmuserinfDao")
+    @Resource(name = "FrmuserinfDao")
     private FrmuserinfDao frmuserinfDao;
 
-    public void register(Frmuserinf frmuserinf) throws Exception{
-        try {
-            frmuserinfDao.insert(frmuserinf);
-        }catch (Exception e) { //TODO 为框架增加异常处理功能
-            throw e; //runtimeException，可以不必catch的
-        }
-
+    /**
+     * 向用户信息表中插入用户新注册信息
+     * @param frmuserinf
+     */
+    @Transactional(rollbackFor = PersistenceException.class)
+    public void register(Frmuserinf frmuserinf) {
+        frmuserinfDao.insert(frmuserinf);
     }
 
+    /**
+     * 验证用户登录时，输入的用户名密码是否正确
+     * @param frmuserinf
+     * @return
+     */
+    public boolean varify(Frmuserinf frmuserinf) {
+        FrmuserinfExample frmuserinfExample = new FrmuserinfExample();
+        frmuserinfExample.createCriteria().
+                andUserregnamEqualTo(frmuserinf.getUserregnam()).
+                andUserpasswdEqualTo(frmuserinf.getUserpasswd());
+        Long count = frmuserinfDao.countByExample(frmuserinfExample);
+        if (count == 1) {
+            return true;
+        }
+        return false;
+    }
 }
